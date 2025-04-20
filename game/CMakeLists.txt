@@ -22,8 +22,18 @@ vorbisfile
 
 file(GLOB GAME_SOURCES
 src/main.cpp
+src/engine/*.cpp
+src/game/scenes/*.cpp
 )
 
-add_executable(${GAME_NAME} ${GAME_SOURCES})
+file(GLOB GAME_HEADERS
+src/engine/*.h
+src/game/*.h
+)
+
+add_executable(${GAME_NAME} ${GAME_SOURCES} ${GAME_HEADERS})
 
 target_link_libraries(${GAME_NAME} PRIVATE ${GAME_LIBS})
+target_include_directories(${GAME_NAME} PRIVATE 
+src/
+)
