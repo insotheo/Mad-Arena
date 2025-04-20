@@ -10,7 +10,7 @@ int main() {
 
 	sf::Clock game_timer;
 
-	sf::RenderWindow window(sf::VideoMode({ 400, 400 }), "Hello, World!");
+	sf::RenderWindow window(sf::VideoMode({ 1280, 720 }), "Mad-Arena");
 	window.setVerticalSyncEnabled(true);
 
 	game_timer.restart();

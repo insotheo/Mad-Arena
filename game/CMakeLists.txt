@@ -38,3 +38,12 @@ target_link_libraries(${GAME_NAME} PRIVATE ${GAME_LIBS})
 target_include_directories(${GAME_NAME} PRIVATE 
 src/
 )
+
+add_custom_command(
+    TARGET ${GAME_NAME}
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets"
+        "${CMAKE_BINARY_DIR}/assets"
+    COMMENT "Copying assets directory to build directory..."
+)

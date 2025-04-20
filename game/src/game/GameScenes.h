@@ -1,6 +1,7 @@
 #ifndef GAME_SCENES
 #define GAME_SCENES
 
+#include <SFML/Graphics.hpp>
 #include "engine/Scene.h"
 #include "game/GamePawns.h"
 
@@ -13,6 +14,7 @@ public:
 	void event(WND wnd, const EVENT e) override;
 
 private:
+	sf::View m_camera;
 	PlayerPawn* m_player;
 };
 
