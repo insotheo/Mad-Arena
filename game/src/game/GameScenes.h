@@ -2,6 +2,7 @@
 #define GAME_SCENES
 
 #include <SFML/Graphics.hpp>
+#include <vector>
 #include "engine/Scene.h"
 #include "game/GamePawns.h"
 
@@ -13,9 +14,12 @@ public:
 	void finish() override;
 	void event(WND wnd, const EVENT e) override;
 
+	inline void push_bullet(BulletPawn* bullet) { m_bullets.push_back(bullet); };
 private:
 	sf::View m_camera;
 	PlayerPawn* m_player;
+
+	std::vector<BulletPawn*> m_bullets;
 };
 
 #endif // !GAME_SCENES

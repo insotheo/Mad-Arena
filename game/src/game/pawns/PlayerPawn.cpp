@@ -1,5 +1,6 @@
 #include "game/GamePawns.h"
 
+#include "game/GameScenes.h"
 #include <math.h>
 
 sf::Texture PlayerPawn::s_default;
@@ -28,6 +29,27 @@ void PlayerPawn::tick(WND wnd, SCENE_REF scene, float dt)
 	float dx = (mousePos.x - m_pos.x) / distance;
 	float dy = (mousePos.y - m_pos.y) / distance;
 	float angle = std::atan2f(dy, dx);
+
+	//shooting
+	if (!m_canShoot) {
+		m_shootTimer += dt;
+		if (m_shootTimer >= m_stats.shootDelay) {
+			m_shootTimer = 0.f;
+			m_canShoot = true;
+		}
+	}
+
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && m_canShoot) {
+		sf::Vector2f dir(dx, dy);
+
+		BulletPawn* bullet = new BulletPawn(m_pos + sf::Vector2f{1.5f * m_sprite->getLocalBounds().size.x * dir.x, 1.5f * m_sprite->getLocalBounds().size.y * dir.y}, dir * m_stats.bulletSpeed, m_stats.bulletLifeTime);
+		bullet->begin();
+		static_cast<GameScene&>(scene).push_bullet(bullet);
+
+		m_pos -= dir * m_stats.kickback;
+
+		m_canShoot = false;
+	}
 
 	m_sprite->setRotation(sf::radians(angle));
 	m_sprite->setPosition(m_pos);

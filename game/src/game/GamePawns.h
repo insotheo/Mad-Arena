@@ -7,6 +7,36 @@
 
 struct PlayerStats {
 	float movementSpeed;
+
+	float bulletSpeed;
+	float bulletLifeTime; //in SECONDS
+	float kickback;
+	float shootDelay; //in SECONDS
+};
+
+class BulletPawn : public Pawn {
+public:
+	BulletPawn(const sf::Vector2f& initPos, const sf::Vector2f& dir, const float lifeTime) 
+		: m_sprite(s_bullet), m_pos(initPos), m_delta(dir), m_lifeTime(lifeTime)
+	{}
+
+	void begin() override;
+	void draw(WND wnd, SCENE_REF scene) override;
+	void tick(WND wnd, SCENE_REF scene, float dt) override;
+
+	inline bool getIsAlive() const { return m_isAlive; };
+private:
+	static sf::Texture s_bullet;
+	sf::Sprite m_sprite;
+
+	float m_timer = 0;
+	bool m_isAlive = true;
+
+	sf::Vector2f m_pos;
+
+	//PARAMS
+	const sf::Vector2f m_delta;
+	const float m_lifeTime;
 };
 
 class PlayerPawn : public Pawn {
@@ -28,8 +58,12 @@ private:
 	static sf::Texture s_default;
 	static sf::Texture s_anim;
 
+	//shooting
+	float m_shootTimer = 0.f;
+	bool m_canShoot = true;
+
 	//STATS
-	PlayerStats m_stats = {2.f};
+	PlayerStats m_stats = {2.f, 1.f, 1.5f, 10.f, 0.07f};
 };
 
 #endif // !GAME_PAWNS
