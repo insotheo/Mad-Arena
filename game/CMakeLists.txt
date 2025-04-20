@@ -24,6 +24,7 @@ file(GLOB GAME_SOURCES
 src/main.cpp
 src/engine/*.cpp
 src/game/scenes/*.cpp
+src/game/pawns/*.cpp
 )
 
 file(GLOB GAME_HEADERS

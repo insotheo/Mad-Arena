@@ -16,4 +16,6 @@ public:
 
 #define NEW_SCENE(CLASS_NAME) new CLASS_NAME()
 
+typedef Scene& SCENE_REF;
+
 #endif // !ENGINE_SCENE
