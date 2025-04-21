@@ -6,13 +6,11 @@
 sf::Texture PlayerPawn::s_default;
 sf::Texture PlayerPawn::s_anim;
 
-void PlayerPawn::begin() {
-	if (!s_default.loadFromFile("./assets/player/sprite.png")) { return; }
-	if (!s_anim.loadFromFile("./assets/player/animation.png")) { return; }
+bool PlayerPawn::s_assetsLoaded = false;
 
-	m_sprite = new sf::Sprite(s_default);
-	m_sprite->setScale({ 2.5f, 2.5f });
-	m_sprite->setOrigin(m_sprite->getLocalBounds().getCenter());
+void PlayerPawn::begin() {
+	m_sprite.setScale({ 2.5f, 2.5f });
+	m_sprite.setOrigin(m_sprite.getLocalBounds().getCenter());
 }
 
 void PlayerPawn::tick(WND wnd, SCENE_REF scene, float dt)
@@ -42,7 +40,7 @@ void PlayerPawn::tick(WND wnd, SCENE_REF scene, float dt)
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && m_canShoot) {
 		sf::Vector2f dir(dx, dy);
 
-		BulletPawn* bullet = new BulletPawn(m_pos + sf::Vector2f{1.5f * m_sprite->getLocalBounds().size.x * dir.x, 1.5f * m_sprite->getLocalBounds().size.y * dir.y}, dir * m_stats.bulletSpeed, m_stats.bulletLifeTime);
+		BulletPawn* bullet = new BulletPawn(m_pos + sf::Vector2f{1.5f * m_sprite.getLocalBounds().size.x * dir.x, 1.5f * m_sprite.getLocalBounds().size.y * dir.y}, dir * m_stats.bulletSpeed, m_stats.bulletLifeTime);
 		bullet->begin();
 		static_cast<GameScene&>(scene).push_bullet(bullet);
 
@@ -51,16 +49,36 @@ void PlayerPawn::tick(WND wnd, SCENE_REF scene, float dt)
 		m_canShoot = false;
 	}
 
-	m_sprite->setRotation(sf::radians(angle));
-	m_sprite->setPosition(m_pos);
+	m_sprite.setRotation(sf::radians(angle));
+	m_sprite.setPosition(m_pos);
 }
 
 void PlayerPawn::draw(WND wnd, SCENE_REF scene)
 {
-	wnd.draw(*m_sprite);
+	wnd.draw(m_sprite);
 }
 
 void PlayerPawn::finish()
 {
-	delete m_sprite;
+	PlayerPawn::unloadAssets();
+}
+
+void PlayerPawn::loadAssets()
+{
+	if (!s_assetsLoaded) {
+		if (!s_default.loadFromFile("./assets/player/sprite.png")) { return; }
+		if (!s_anim.loadFromFile("./assets/player/animation.png")) { return; }
+
+		s_assetsLoaded = true;
+	}
+}
+
+void PlayerPawn::unloadAssets()
+{
+	if (s_assetsLoaded) {
+		s_default = {};
+		s_anim = {};
+
+		s_assetsLoaded = false;
+	}
 }

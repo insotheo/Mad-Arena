@@ -3,6 +3,9 @@
 #include <iostream>
 
 void GameScene::begin() {
+	PlayerPawn::loadAssets();
+	BulletPawn::loadAssets();
+
 	m_player = new PlayerPawn();
 
 	m_player->begin();
@@ -26,7 +29,6 @@ void GameScene::tick(WND wnd, float dt)
 			++it;
 		}
 	}
-
 }
 
 void GameScene::draw(WND wnd)
@@ -34,15 +36,20 @@ void GameScene::draw(WND wnd)
 	wnd.setView(m_camera);
 	m_player->draw(wnd, *this);
 
+	sf::FloatRect viewRect(m_camera.getCenter() - (m_camera.getSize() / 2.f), m_camera.getSize());
+
 	for (auto& bullet : m_bullets) {
-		bullet->draw(wnd, *this);
+		if (viewRect.contains(bullet->getRectangle().position)) {
+			bullet->draw(wnd, *this);
+		}
 	}
 }
 
 void GameScene::finish()
 {
 	delete m_player;
-	std::cout << "Goodbye!\n";
+
+	BulletPawn::unloadAssets();
 }
 
 void GameScene::event(WND wnd, const EVENT e)

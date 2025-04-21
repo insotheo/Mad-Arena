@@ -1,11 +1,9 @@
 #include "game/GamePawns.h"
 
 sf::Texture BulletPawn::s_bullet;
+bool BulletPawn::s_textureLoaded = false;
 
 void BulletPawn::begin() {
-	if (!s_bullet.loadFromFile("./assets/bullet.png")) { return; }
-
-	m_sprite = sf::Sprite(s_bullet);
 	m_sprite.setOrigin(m_sprite.getLocalBounds().getCenter());
 	m_sprite.setScale({ 2, 2 });
 	m_sprite.setPosition(m_pos);
@@ -25,4 +23,19 @@ void BulletPawn::tick(WND wnd, SCENE_REF scene, float dt)
 
 void BulletPawn::draw(WND wnd, SCENE_REF scene) {
 	wnd.draw(m_sprite);
+}
+
+void BulletPawn::loadAssets() {
+	if (!s_textureLoaded) {
+		if (!s_bullet.loadFromFile("./assets/bullet.png")) { return; }
+		else s_textureLoaded = true;
+	}
+}
+
+void BulletPawn::unloadAssets()
+{
+	if (s_textureLoaded) {
+		s_bullet = {};
+		s_textureLoaded = false;
+	}
 }

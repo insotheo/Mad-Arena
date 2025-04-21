@@ -25,9 +25,15 @@ public:
 	void tick(WND wnd, SCENE_REF scene, float dt) override;
 
 	inline bool getIsAlive() const { return m_isAlive; };
+	inline const sf::FloatRect& getRectangle() const { return m_sprite.getGlobalBounds(); };
+
+	static void loadAssets();
+	static void unloadAssets();
 private:
-	static sf::Texture s_bullet;
 	sf::Sprite m_sprite;
+
+	static sf::Texture s_bullet;
+	static bool s_textureLoaded;
 
 	float m_timer = 0;
 	bool m_isAlive = true;
@@ -41,6 +47,9 @@ private:
 
 class PlayerPawn : public Pawn {
 public:
+	PlayerPawn()
+		: m_sprite(s_default)
+	{ }
 	~PlayerPawn() { finish(); }
 
 	void begin() override;
@@ -48,15 +57,20 @@ public:
 	void draw(WND wnd, SCENE_REF scene) override;
 	void finish() override;
 
+	static void loadAssets();
+	static void unloadAssets();
+
 	inline const sf::Vector2f& getPos() const { return m_pos; };
 	inline const PlayerStats& getStats() const { return m_stats; };
 private:
 	sf::Vector2f m_pos = {0.f, 0.f};
 
-	sf::Sprite* m_sprite;
+	sf::Sprite m_sprite;
 
+	//assets
 	static sf::Texture s_default;
 	static sf::Texture s_anim;
+	static bool s_assetsLoaded;
 
 	//shooting
 	float m_shootTimer = 0.f;
