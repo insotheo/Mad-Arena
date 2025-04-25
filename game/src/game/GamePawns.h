@@ -24,6 +24,8 @@ public:
 	void draw(WND wnd, SCENE_REF scene) override;
 	void tick(WND wnd, SCENE_REF scene, float dt) override;
 
+	void end();
+
 	inline bool getIsAlive() const { return m_isAlive; };
 	inline const sf::FloatRect& getRectangle() const { return m_sprite.getGlobalBounds(); };
 
@@ -33,10 +35,12 @@ private:
 	sf::Sprite m_sprite;
 
 	static sf::Texture s_bullet;
+	static sf::Texture s_endTexture;
 	static bool s_textureLoaded;
 
 	float m_timer = 0;
 	bool m_isAlive = true;
+	bool m_isEnd = false;
 
 	sf::Vector2f m_pos;
 

@@ -33,6 +33,8 @@ void GameScene::tick(WND wnd, float dt)
 
 void GameScene::draw(WND wnd)
 {
+	wnd.clear(sf::Color{ 122, 122, 122, 255 });
+
 	wnd.setView(m_camera);
 	m_player->draw(wnd, *this);
 
