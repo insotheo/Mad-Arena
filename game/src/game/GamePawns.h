@@ -5,19 +5,12 @@
 
 #include "engine/Pawn.h"
 
-struct PlayerStats {
-	float movementSpeed;
-
-	float bulletSpeed;
-	float bulletLifeTime; //in SECONDS
-	float kickback;
-	float shootDelay; //in SECONDS
-};
+#include "game/GameConfig.h"
 
 class BulletPawn : public Pawn {
 public:
-	BulletPawn(const sf::Vector2f& initPos, const sf::Vector2f& dir, const float lifeTime) 
-		: m_sprite(s_bullet), m_pos(initPos), m_delta(dir), m_lifeTime(lifeTime)
+	BulletPawn(const sf::Vector2f& initPos, const sf::Vector2f& dir) 
+		: m_sprite(s_bullet), m_pos(initPos), m_delta(dir * CONFIG_BULLET_SPEED)
 	{}
 
 	void begin() override;
@@ -27,6 +20,7 @@ public:
 	void end();
 
 	inline bool getIsAlive() const { return m_isAlive; };
+	inline void kill() { m_isAlive = false; }
 	inline const sf::FloatRect& getRectangle() const { return m_sprite.getGlobalBounds(); };
 
 	static void loadAssets();
@@ -46,13 +40,12 @@ private:
 
 	//PARAMS
 	const sf::Vector2f m_delta;
-	const float m_lifeTime;
 };
 
 class PlayerPawn : public Pawn {
 public:
-	PlayerPawn()
-		: m_sprite(s_default)
+	PlayerPawn(const sf::Vector2f& initPos)
+		: m_sprite(s_default), m_pos(initPos)
 	{ }
 	~PlayerPawn() { finish(); }
 
@@ -66,9 +59,12 @@ public:
 
 	inline const sf::Vector2f& getPos() const { return m_pos; };
 	inline const sf::FloatRect& getRect() const { return m_sprite.getGlobalBounds(); }
-	inline const PlayerStats& getStats() const { return m_stats; };
+
+	inline bool isAlive() const { return m_health > 0; }
+	inline void kick(float damage) { m_health -= damage; }
+	inline float getHealth() const { return m_health; }
 private:
-	sf::Vector2f m_pos = {0.f, 0.f};
+	sf::Vector2f m_pos;
 	sf::Vector2f m_vel = { 0.f, 0.f };
 
 	sf::Sprite m_sprite;
@@ -82,8 +78,9 @@ private:
 	float m_shootTimer = 0.f;
 	bool m_canShoot = true;
 
-	//STATS
-	PlayerStats m_stats;
+	//stats
+
+	float m_health = CONFIG_PLAYER_INITIAL_HEALTH;
 };
 
 class EnemyPawn : public Pawn {
@@ -99,11 +96,14 @@ public:
 	inline const sf::FloatRect& getRect() const { return m_sprite.getGlobalBounds(); }
 	inline const sf::Vector2f& getPos() const { return m_pos; }
 
+	inline bool isAlive() const { return m_health > 0; }
+	inline void kick(const float damage) { m_health -= damage; }
+
 	static void loadAssets();
 	static void unloadAssets();
 private:
 
-	const float m_speed = 2.f;
+	float m_health = CONFIG_ENEMY_INTIAL_HEALTH;
 
 	sf::Sprite m_sprite;
 	sf::Vector2f m_pos;

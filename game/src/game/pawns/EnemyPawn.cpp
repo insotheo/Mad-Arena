@@ -9,7 +9,7 @@ void EnemyPawn::_begin(const sf::Vector2f& initPos)
 {
 	m_pos = { initPos };
 	m_sprite.setPosition(m_pos);
-	m_sprite.setScale(sf::Vector2f{ 3.f, 3.f });
+	m_sprite.setScale(sf::Vector2f{ 2.7f, 2.7f });
 	m_sprite.setOrigin(m_sprite.getLocalBounds().getCenter());
 }
 
@@ -23,9 +23,9 @@ void EnemyPawn::ai_tick(WND wnd, const PlayerPawn& player, float dt)
 	
 	if (dist > 0) {
 		sf::Vector2f dir(dx / dist, dy / dist);
-		double angle = std::atan2(dir.y, dir.x);
+		float angle = std::atan2f(dir.y, dir.x);
 
-		m_pos += dir * m_speed;
+		m_pos += dir * CONFIG_ENEMY_SPEED;
 
 		m_sprite.setRotation(sf::radians(angle));
 		m_sprite.setPosition(m_pos);

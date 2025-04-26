@@ -18,7 +18,7 @@ void BulletPawn::tick(WND wnd, SCENE_REF scene, float dt)
 			m_pos += m_delta;
 			m_sprite.setPosition(m_pos);
 		}
-		if (m_timer >= m_lifeTime) {
+		if (m_timer >= CONFIG_BULLET_LIFETIME) {
 			if (m_isEnd) {
 				m_isAlive = false;
 			}
@@ -29,7 +29,7 @@ void BulletPawn::tick(WND wnd, SCENE_REF scene, float dt)
 
 void BulletPawn::end()
 {
-	m_timer = m_lifeTime - 0.15f;
+	m_timer = CONFIG_BULLET_LIFETIME - 0.15f;
 	m_sprite.setTexture(s_endTexture);
 	m_isEnd = true;
 }

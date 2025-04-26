@@ -9,12 +9,6 @@ sf::Texture PlayerPawn::s_anim;
 bool PlayerPawn::s_assetsLoaded = false;
 
 void PlayerPawn::begin() {
-	m_stats.movementSpeed = 2.8f;
-	m_stats.bulletLifeTime = 1.5f;
-	m_stats.bulletSpeed = 4.f;
-	m_stats.kickback = 9.f;
-	m_stats.shootDelay = 0.15f;
-
 	m_sprite.setScale({ 2.5f, 2.5f });
 	m_sprite.setOrigin(m_sprite.getLocalBounds().getCenter());
 }
@@ -22,10 +16,10 @@ void PlayerPawn::begin() {
 void PlayerPawn::tick(WND wnd, SCENE_REF scene, float dt)
 {
 	//movement
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) m_vel.y -= m_stats.movementSpeed;
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) m_vel.y += m_stats.movementSpeed;
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) m_vel.x -= m_stats.movementSpeed;
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) m_vel.x += m_stats.movementSpeed;
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) m_vel.y -= CONFIG_PLAYER_MOVEMENT_SPEED;
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) m_vel.y += CONFIG_PLAYER_MOVEMENT_SPEED;
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) m_vel.x -= CONFIG_PLAYER_MOVEMENT_SPEED;
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) m_vel.x += CONFIG_PLAYER_MOVEMENT_SPEED;
 
 	//rotation
 	sf::Vector2f mousePos = wnd.mapPixelToCoords(sf::Mouse::getPosition(wnd), wnd.getView());
@@ -37,7 +31,7 @@ void PlayerPawn::tick(WND wnd, SCENE_REF scene, float dt)
 	//shooting
 	if (!m_canShoot) {
 		m_shootTimer += dt;
-		if (m_shootTimer >= m_stats.shootDelay) {
+		if (m_shootTimer >= CONFIG_PLAYER_SHOOT_DELAY) {
 			m_shootTimer = 0.f;
 			m_canShoot = true;
 		}
@@ -46,11 +40,12 @@ void PlayerPawn::tick(WND wnd, SCENE_REF scene, float dt)
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && m_canShoot) {
 		sf::Vector2f dir(dx, dy);
 
-		BulletPawn* bullet = new BulletPawn(m_pos + sf::Vector2f{1.5f * m_sprite.getLocalBounds().size.x * dir.x, 1.5f * m_sprite.getLocalBounds().size.y * dir.y}, dir * m_stats.bulletSpeed, m_stats.bulletLifeTime);
+		BulletPawn* bullet = new BulletPawn(m_pos + sf::Vector2f{1.5f * m_sprite.getLocalBounds().size.x * dir.x, 1.5f * m_sprite.getLocalBounds().size.y * dir.y},
+			dir);
 		bullet->begin();
 		static_cast<GameScene&>(scene).push_bullet(bullet);
 
-		m_vel -= dir * m_stats.kickback;
+		m_vel -= dir * CONFIG_PLAYER_KICKBACK;
 
 		m_canShoot = false;
 	}

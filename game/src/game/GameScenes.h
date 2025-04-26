@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include "game/GameConfig.h"
 #include "engine/Scene.h"
 #include "game/GamePawns.h"
 #include "game/Map.h"

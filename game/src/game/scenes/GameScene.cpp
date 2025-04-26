@@ -2,17 +2,16 @@
 
 #include <iostream>
 
-#define ENEMY_SPAWN 2 //in seconds
-
 void GameScene::begin() {
 	EnemyPawn::loadAssets();
 	BulletPawn::loadAssets();
 	PlayerPawn::loadAssets();
 
 	m_map = new Map();
-	m_player = new PlayerPawn();
+	m_map->_begin(CONFIG_GAME_MAP_SIZE_X, CONFIG_GAME_MAP_SIZE_Y);
 
-	m_map->_begin(50, 50);
+	m_player = new PlayerPawn(m_map->getMapCenter());
+
 	m_player->begin();
 	m_camera.setSize({ 800, 600 });
 }
@@ -23,7 +22,7 @@ void GameScene::tick(WND wnd, float dt)
 	m_camera.setCenter(m_player->getPos());
 
 	m_enemySpawnerTimer += dt;
-	if (m_enemySpawnerTimer >= ENEMY_SPAWN) {
+	if (m_enemySpawnerTimer >= CONFIG_ENEMY_SPAWN_DELAY) {
 		m_enemySpawnerTimer = 0.f;
 
 		EnemyPawn* enemy = new EnemyPawn();
@@ -31,6 +30,7 @@ void GameScene::tick(WND wnd, float dt)
 		m_enemies.push_back(enemy);
 	}
 
+	//updates
 	for (auto it = m_bullets.begin(); it != m_bullets.end(); ) {
 		BulletPawn* bullet = *it;
 		bullet->tick(wnd, *this, dt);
@@ -48,7 +48,42 @@ void GameScene::tick(WND wnd, float dt)
 		EnemyPawn* enemy = *it;
 		enemy->ai_tick(wnd, *m_player, dt);
 
-		++it;
+		if (!enemy->isAlive()) {
+			delete enemy;
+			it = m_enemies.erase(it);
+		}
+		else {
+			++it;
+		}
+	}
+
+	//bullet intersections
+	for (auto& bullet : m_bullets) {
+		if (bullet->getIsAlive()) {
+			for (auto& enemy : m_enemies) {
+				sf::FloatRect enemyRect(enemy->getPos() - (enemy->getRect().size / 4.f), enemy->getRect().size / 2.f);
+				if (enemyRect.contains(bullet->getRectangle().position)) {
+					bullet->kill();
+					enemy->kick(CONFIG_BULLET_DAMAGE);
+					break;
+				}
+			}
+		}
+	}
+
+	//player being attacked
+	for (auto& enemy : m_enemies) {
+		if (enemy->isAlive()) {
+			sf::FloatRect enemyRect(enemy->getPos() - (enemy->getRect().size / 6.f), enemy->getRect().size / 4.f);
+			if (enemyRect.findIntersection({m_player->getPos() - (m_player->getRect().size / 2.f), m_player->getRect().size })) {
+				m_player->kick(CONFIG_ENEMY_DAMAGE);
+				continue;
+			}
+		}
+	}
+
+	if (!m_map->isPointOnMap(m_player->getPos())) {
+		m_player->kick(CONFIG_GAME_WATER_DAMAGE);
 	}
 }
 
