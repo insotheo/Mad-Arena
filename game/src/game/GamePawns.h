@@ -81,7 +81,7 @@ private:
 	bool m_canShoot = true;
 
 	//STATS
-	PlayerStats m_stats = {2.f, 1.f, 1.5f, 10.f, 0.07f};
+	PlayerStats m_stats;
 };
 
 #endif // !GAME_PAWNS

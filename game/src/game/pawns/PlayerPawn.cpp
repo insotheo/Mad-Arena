@@ -9,6 +9,12 @@ sf::Texture PlayerPawn::s_anim;
 bool PlayerPawn::s_assetsLoaded = false;
 
 void PlayerPawn::begin() {
+	m_stats.movementSpeed = 2.8f;
+	m_stats.bulletLifeTime = 1.7f;
+	m_stats.bulletSpeed = 3.f;
+	m_stats.kickback = 2.f;
+	m_stats.shootDelay = 0.09f;
+
 	m_sprite.setScale({ 2.5f, 2.5f });
 	m_sprite.setOrigin(m_sprite.getLocalBounds().getCenter());
 }

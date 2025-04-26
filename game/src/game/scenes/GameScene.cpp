@@ -6,8 +6,10 @@ void GameScene::begin() {
 	PlayerPawn::loadAssets();
 	BulletPawn::loadAssets();
 
+	m_map = new Map();
 	m_player = new PlayerPawn();
 
+	m_map->_begin(50, 50);
 	m_player->begin();
 	m_camera.setSize({ 800, 600 });
 }
@@ -33,12 +35,14 @@ void GameScene::tick(WND wnd, float dt)
 
 void GameScene::draw(WND wnd)
 {
-	wnd.clear(sf::Color{ 122, 122, 122, 255 });
-
 	wnd.setView(m_camera);
+	wnd.clear(sf::Color{ 8, 118, 119, 255 });
+	sf::FloatRect viewRect(m_camera.getCenter() - (m_camera.getSize() / 2.f), m_camera.getSize());
+
+	m_map->_draw(wnd, viewRect);
+
 	m_player->draw(wnd, *this);
 
-	sf::FloatRect viewRect(m_camera.getCenter() - (m_camera.getSize() / 2.f), m_camera.getSize());
 
 	for (auto& bullet : m_bullets) {
 		if (viewRect.contains(bullet->getRectangle().position)) {
@@ -50,6 +54,7 @@ void GameScene::draw(WND wnd)
 void GameScene::finish()
 {
 	delete m_player;
+	delete m_map;
 
 	BulletPawn::unloadAssets();
 }

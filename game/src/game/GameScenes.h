@@ -5,6 +5,7 @@
 #include <vector>
 #include "engine/Scene.h"
 #include "game/GamePawns.h"
+#include "game/Map.h"
 
 class GameScene : public Scene {
 public:
@@ -18,6 +19,7 @@ public:
 private:
 	sf::View m_camera;
 	PlayerPawn* m_player;
+	Map* m_map;
 
 	std::vector<BulletPawn*> m_bullets;
 };
