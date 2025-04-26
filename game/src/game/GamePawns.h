@@ -65,9 +65,11 @@ public:
 	static void unloadAssets();
 
 	inline const sf::Vector2f& getPos() const { return m_pos; };
+	inline const sf::FloatRect& getRect() const { return m_sprite.getGlobalBounds(); }
 	inline const PlayerStats& getStats() const { return m_stats; };
 private:
 	sf::Vector2f m_pos = {0.f, 0.f};
+	sf::Vector2f m_vel = { 0.f, 0.f };
 
 	sf::Sprite m_sprite;
 
@@ -82,6 +84,32 @@ private:
 
 	//STATS
 	PlayerStats m_stats;
+};
+
+class EnemyPawn : public Pawn {
+public:
+	EnemyPawn()
+		: m_sprite(s_texture)
+	{}
+	
+	void _begin(const sf::Vector2f& initPos);
+	void ai_tick(WND wnd, const PlayerPawn& player, float dt);
+	void draw(WND wnd, SCENE_REF scene) override;
+
+	inline const sf::FloatRect& getRect() const { return m_sprite.getGlobalBounds(); }
+	inline const sf::Vector2f& getPos() const { return m_pos; }
+
+	static void loadAssets();
+	static void unloadAssets();
+private:
+
+	const float m_speed = 2.f;
+
+	sf::Sprite m_sprite;
+	sf::Vector2f m_pos;
+
+	static bool s_loaded;
+	static sf::Texture s_texture;
 };
 
 #endif // !GAME_PAWNS

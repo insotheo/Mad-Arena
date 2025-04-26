@@ -1,12 +1,11 @@
 #include "Map.h"
-#include "Map.h"
 
 void Map::_begin(const unsigned int xSize, const unsigned int ySize) {
 	if (!m_texture.loadFromFile("./assets/tile.png")) { return; }
 
 	m_sprite = sf::Sprite(m_texture);
 	m_sprite.setScale({ 2.25f,2.25f });
-	m_sprite.setOrigin(m_sprite.getLocalBounds().size / 2.f);
+	m_sprite.setOrigin(m_sprite.getLocalBounds().size);
 
 	for (int y = 0; y < ySize; ++y) {
 		for (int x = 0; x < xSize; ++x) {

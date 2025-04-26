@@ -22,6 +22,9 @@ private:
 	Map* m_map;
 
 	std::vector<BulletPawn*> m_bullets;
+	std::vector<EnemyPawn*> m_enemies;
+
+	float m_enemySpawnerTimer = 0.f;
 };
 
 #endif // !GAME_SCENES

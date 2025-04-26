@@ -10,10 +10,10 @@ bool PlayerPawn::s_assetsLoaded = false;
 
 void PlayerPawn::begin() {
 	m_stats.movementSpeed = 2.8f;
-	m_stats.bulletLifeTime = 1.7f;
-	m_stats.bulletSpeed = 3.f;
-	m_stats.kickback = 2.f;
-	m_stats.shootDelay = 0.09f;
+	m_stats.bulletLifeTime = 1.5f;
+	m_stats.bulletSpeed = 4.f;
+	m_stats.kickback = 9.f;
+	m_stats.shootDelay = 0.15f;
 
 	m_sprite.setScale({ 2.5f, 2.5f });
 	m_sprite.setOrigin(m_sprite.getLocalBounds().getCenter());
@@ -22,10 +22,10 @@ void PlayerPawn::begin() {
 void PlayerPawn::tick(WND wnd, SCENE_REF scene, float dt)
 {
 	//movement
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) m_pos.y -= m_stats.movementSpeed;
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) m_pos.y += m_stats.movementSpeed;
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) m_pos.x -= m_stats.movementSpeed;
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) m_pos.x += m_stats.movementSpeed;
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) m_vel.y -= m_stats.movementSpeed;
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) m_vel.y += m_stats.movementSpeed;
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) m_vel.x -= m_stats.movementSpeed;
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) m_vel.x += m_stats.movementSpeed;
 
 	//rotation
 	sf::Vector2f mousePos = wnd.mapPixelToCoords(sf::Mouse::getPosition(wnd), wnd.getView());
@@ -50,13 +50,17 @@ void PlayerPawn::tick(WND wnd, SCENE_REF scene, float dt)
 		bullet->begin();
 		static_cast<GameScene&>(scene).push_bullet(bullet);
 
-		m_pos -= dir * m_stats.kickback;
+		m_vel -= dir * m_stats.kickback;
 
 		m_canShoot = false;
 	}
 
+	m_pos += m_vel;
+
 	m_sprite.setRotation(sf::radians(angle));
 	m_sprite.setPosition(m_pos);
+
+	m_vel = { 0, 0 };
 }
 
 void PlayerPawn::draw(WND wnd, SCENE_REF scene)
