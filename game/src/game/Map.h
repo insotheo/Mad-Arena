@@ -19,6 +19,16 @@ public:
 
 	inline const sf::Vector2f getMapCenter() const { return sf::Vector2f((float)(m_xBegin + m_xEnd) / 2.f, (float)(m_yBegin + m_yEnd) / 2.f); }
 
+	inline std::vector<sf::Vector2f> getSpawnPoints() const {
+		std::vector<sf::Vector2f> points = {
+			sf::Vector2f(m_xBegin, m_yBegin), sf::Vector2f(m_xEnd, m_yEnd),
+			sf::Vector2f(m_xBegin, m_yEnd), sf::Vector2f(m_xEnd, m_yBegin),
+			sf::Vector2f((m_xBegin + m_xEnd) / 2.f, m_yBegin), sf::Vector2f((m_xBegin + m_xEnd) / 2.f, m_yEnd),
+			sf::Vector2f(m_xBegin, (m_yBegin + m_yEnd) / 2.f), sf::Vector2f(m_xEnd, (m_yBegin + m_yEnd) / 2.f)
+		};
+		return points;
+	}
+
 private:
 	sf::Texture m_texture;
 	sf::Sprite m_sprite;

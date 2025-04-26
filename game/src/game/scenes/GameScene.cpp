@@ -3,12 +3,17 @@
 #include <iostream>
 
 void GameScene::begin() {
+	std::random_device rd;
+	m_randEng = std::mt19937(rd());
+	m_dist = std::uniform_int_distribution<int>(0, 7);
+
 	EnemyPawn::loadAssets();
 	BulletPawn::loadAssets();
 	PlayerPawn::loadAssets();
 
 	m_map = new Map();
 	m_map->_begin(CONFIG_GAME_MAP_SIZE_X, CONFIG_GAME_MAP_SIZE_Y);
+	m_spawnersPoints = m_map->getSpawnPoints();
 
 	m_player = new PlayerPawn(m_map->getMapCenter());
 
@@ -26,7 +31,8 @@ void GameScene::tick(WND wnd, float dt)
 		m_enemySpawnerTimer = 0.f;
 
 		EnemyPawn* enemy = new EnemyPawn();
-		enemy->_begin({ 0, 0 });
+		int index = m_dist(m_randEng);;
+		enemy->_begin(m_spawnersPoints.at(index));
 		m_enemies.push_back(enemy);
 	}
 
@@ -74,7 +80,7 @@ void GameScene::tick(WND wnd, float dt)
 	//player being attacked
 	for (auto& enemy : m_enemies) {
 		if (enemy->isAlive()) {
-			sf::FloatRect enemyRect(enemy->getPos() - (enemy->getRect().size / 6.f), enemy->getRect().size / 4.f);
+			sf::FloatRect enemyRect(enemy->getPos() - (enemy->getRect().size / 8.f), enemy->getRect().size / 4.f);
 			if (enemyRect.findIntersection({m_player->getPos() - (m_player->getRect().size / 2.f), m_player->getRect().size })) {
 				m_player->kick(CONFIG_ENEMY_DAMAGE);
 				continue;
@@ -98,7 +104,7 @@ void GameScene::draw(WND wnd)
 	m_player->draw(wnd, *this);
 
 	for (auto& enemy : m_enemies) {
-		if (viewRect.findIntersection({enemy->getPos(), enemy->getRect().size * 1.25f})) {
+		if (viewRect.findIntersection({ enemy->getPos() - (enemy->getRect().size / 2.f), enemy->getRect().size * 2.f })) {
 			enemy->draw(wnd, *this);
 		}
 	}
