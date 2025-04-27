@@ -22,15 +22,21 @@ private:
 	std::mt19937 m_randEng;
 	std::uniform_int_distribution<int> m_dist;
 
+	std::uniform_real_distribution<float> m_packsDistX;
+	std::uniform_real_distribution<float> m_packsDistY;
+
 	sf::View m_camera;
 	PlayerPawn* m_player;
 	Map* m_map;
 
 	std::vector<BulletPawn*> m_bullets;
 	std::vector<EnemyPawn*> m_enemies;
+	std::vector<AmmoPack*> m_ammoPacks;
 
 	float m_enemySpawnerTimer = 0.f;
 	std::vector<sf::Vector2f> m_spawnersPoints; //array: 8 points
+
+	float m_packSpawnerTimer = 0.f;
 };
 
 #endif // !GAME_SCENES

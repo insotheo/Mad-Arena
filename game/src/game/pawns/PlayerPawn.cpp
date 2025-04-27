@@ -37,13 +37,14 @@ void PlayerPawn::tick(WND wnd, SCENE_REF scene, float dt)
 		}
 	}
 
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && m_canShoot) {
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && m_canShoot && m_ammo > 0) {
 		sf::Vector2f dir(dx, dy);
 
 		BulletPawn* bullet = new BulletPawn(m_pos + sf::Vector2f{1.5f * m_sprite.getLocalBounds().size.x * dir.x, 1.5f * m_sprite.getLocalBounds().size.y * dir.y},
 			dir);
 		bullet->begin();
 		static_cast<GameScene&>(scene).push_bullet(bullet);
+		m_ammo -= 1;
 
 		m_vel -= dir * CONFIG_PLAYER_KICKBACK;
 

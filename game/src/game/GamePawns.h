@@ -7,6 +7,33 @@
 
 #include "game/GameConfig.h"
 
+class AmmoPack : public Pawn {
+public:
+	AmmoPack(const sf::Vector2f& initPos) : m_sprite(s_texture)
+	{
+		m_sprite.setPosition(initPos);
+		m_sprite.setScale({ 1.5f, 1.5f });
+		m_sprite.setOrigin(m_sprite.getLocalBounds().getCenter());
+	}
+
+	void tick(WND wnd, SCENE_REF scene, float dt) override;
+	void draw(WND wnd, SCENE_REF scene) override;
+
+	static void loadAssets();
+	static void unloadAssets();
+
+	inline const sf::FloatRect& getRect() const { return m_sprite.getGlobalBounds(); }
+	inline bool isAlive() const { return m_isAlive; }
+	inline void collect() { m_isAlive = false; }
+private:
+	float m_lifeTimer = 0.f;
+	bool m_isAlive = true;
+	sf::Sprite m_sprite;
+
+	static sf::Texture s_texture;
+	static bool s_loaded;
+};
+
 class BulletPawn : public Pawn {
 public:
 	BulletPawn(const sf::Vector2f& initPos, const sf::Vector2f& dir) 
@@ -63,6 +90,14 @@ public:
 	inline bool isAlive() const { return m_health > 0; }
 	inline void kick(float damage) { m_health -= damage; }
 	inline float getHealth() const { return m_health; }
+
+	inline void reloadAmmo() {
+		if (m_ammoPacks > 0) {
+			m_ammo = CONFIG_PLAYER_AMMO;
+			m_ammoPacks -= 1;
+		}
+	}
+	inline void addAmmoPack() { m_ammoPacks += 1; }
 private:
 	sf::Vector2f m_pos;
 	sf::Vector2f m_vel = { 0.f, 0.f };
@@ -77,6 +112,8 @@ private:
 	//shooting
 	float m_shootTimer = 0.f;
 	bool m_canShoot = true;
+	unsigned int m_ammo = CONFIG_PLAYER_AMMO;
+	unsigned int m_ammoPacks = CONFIG_PLAYER_AMMO_PACK_INIT;
 
 	//stats
 
