@@ -1,8 +1,34 @@
 #include "game/GameScenes.h"
 
 #include <iostream>
+#include <sstream>
+#include "engine/SceneManager.h"
+
+void playAgainBtnClick() {
+	SWITCH_SCENE(0);
+}
+
+void quitGameBtnClick() {
+	std::exit(0);
+}
 
 void GameScene::begin() {
+	FontHandler::load();
+
+	m_timerText = new UIText("0.0 s.", 24, { 65, 20 }, sf::Color::White, sf::Color::Black, 2);
+
+	m_healthText = new UIText("100%", 20, { 65, 60 }, sf::Color::White);
+	m_health = new UIImage("./assets/ui/health.png", sf::FloatRect({ 0, -8 }, { 3.5f, 3.5f }), *m_healthText, { 25, 40 });
+
+	m_ammoText = new UIText("120/3", 18, { 65, 105 }, sf::Color::White);
+	m_ammo = new UIImage("./assets/ui/bullet.png", sf::FloatRect({ 0, -15 }, { 3.5f, 4.5f }), *m_ammoText, { 25, 90 });
+
+	m_pausedText = new UIText("GAME IS PAUSED...\nPress [esc] to play...", 28, { 300, 60 }, sf::Color::White, sf::Color::Black, 2);
+
+	m_statText = new UIText("", 24, {500, 100}, sf::Color::White);
+	m_playAgainBtn = new Button<void(*)()>(playAgainBtnClick, sf::FloatRect({200, 200}, {150, 35}), "PLAY AGAIN", sf::Color::White, sf::Color::Red, sf::Color::Black);
+	m_quitGameBtn = new Button<void(*)()>(quitGameBtnClick, sf::FloatRect({200, 300}, {150, 35}), "QUIT GAME", sf::Color::White, sf::Color::Green, sf::Color::Black);
+
 	m_isPaused = false;
 	m_isGameOver = false;
 	std::random_device rd;
@@ -30,11 +56,23 @@ void GameScene::begin() {
 void GameScene::tick(WND wnd, float dt)
 {
 	if (m_isPaused) {
+		m_gameClock.stop();
 		return;
 	}
 
 	if (m_isGameOver) {
+		{
+			std::stringstream s;
+			s << "You survived for " << (float)((int)(m_gameClock.getElapsedTime().asSeconds() * 10)) / 10 << " s.\n" << "You killed " << m_player->getKills() << " enemies!\n\t\tWell done!";
+			m_statText->setText(s.str());
+		}
+		m_playAgainBtn->tick(wnd, *this, dt);
+		m_quitGameBtn->tick(wnd, *this, dt);
 		return;
+	}
+
+	if (!m_gameClock.isRunning()) {
+		m_gameClock.start();
 	}
 
 	m_player->tick(wnd, *this, dt);
@@ -143,9 +181,27 @@ void GameScene::tick(WND wnd, float dt)
 		}
 	}
 
+	//UI info update
+	{
+		std::stringstream s;
+		s << (float)((int)((m_player->getHealth() / CONFIG_PLAYER_INITIAL_HEALTH * 100) * 10)) / 10 << "%";
+		m_healthText->setText(s.str());
+	}
+	{
+		std::stringstream s;
+		s << m_player->getAmmo() << "/" << m_player->getAmmoPacks();
+		m_ammoText->setText(s.str());
+	}
+	{
+		std::stringstream s;
+		s << (float)((int)(m_gameClock.getElapsedTime().asSeconds() * 10)) / 10 << " s.";
+		m_timerText->setText(s.str());
+	}
+
 	if (m_player->getHealth() <= 0) {
 		m_isGameOver = true;
 		m_isPaused = false;
+		m_gameClock.stop();
 	}
 }
 
@@ -155,12 +211,20 @@ void GameScene::draw(WND wnd)
 	if (m_isGameOver) {
 		wnd.clear(sf::Color::Black);
 		m_player->draw(wnd, *this);
+
+		m_statText->draw(wnd, *this);
+		m_playAgainBtn->draw(wnd, *this);
+		m_quitGameBtn->draw(wnd, *this);
+
 		return;
 	}
 	wnd.clear(sf::Color{ 8, 118, 119, 255 });
 	sf::FloatRect viewRect(m_camera.getCenter() - (m_camera.getSize() / 2.f), m_camera.getSize());
 
 	m_map->_draw(wnd, viewRect);
+	if (m_isPaused) {
+		m_pausedText->draw(wnd, *this);
+	}
 
 	if (!m_isPaused) {
 		m_player->draw(wnd, *this);
@@ -182,37 +246,67 @@ void GameScene::draw(WND wnd)
 				pack->draw(wnd, *this);
 			}
 		}
+
+		//drawing UI
+		m_health->draw(wnd, *this);
+		m_ammo->draw(wnd, *this);
+
+		m_timerText->draw(wnd, *this);
 	}
 }
 
 void GameScene::finish()
 {
-	if (m_bullets.size() > 0) {
-		for (auto it = m_bullets.begin(); it != m_bullets.end(); ) {
-			BulletPawn* bullet = *it;
-			delete bullet;
-			it = m_bullets.erase(it);
-		}
+	for (auto bullet : m_bullets) {
+		delete bullet;
 	}
+	m_bullets.clear();
 
-	if (m_enemies.size() > 0) {
-		for (auto it = m_enemies.begin(); it != m_enemies.end(); ) {
-			EnemyPawn* enemy = *it;
-			delete enemy;
-			it = m_enemies.erase(it);
-		}
+	for (auto enemy : m_enemies) {
+		delete enemy;
 	}
+	m_enemies.clear();
 
-	if (m_ammoPacks.size() > 0) {
-		for (auto it = m_ammoPacks.begin(); it != m_ammoPacks.end(); ) {
-			AmmoPack* pack = *it;
-			delete pack;
-			it = m_ammoPacks.erase(it);
-		}
+	for (auto pack : m_ammoPacks) {
+		delete pack;
 	}
+	m_ammoPacks.clear();
 
 	delete m_player;
+	m_player = nullptr;
+
 	delete m_map;
+	m_map = nullptr;
+
+	m_gameClock.reset();
+
+	delete m_health;
+	m_health = nullptr;
+
+	if (m_healthText) {
+		delete m_healthText;
+		m_healthText = nullptr;
+	}
+
+	delete m_ammo;
+	m_ammo = nullptr;
+
+	if (m_ammoText) {
+		delete m_ammoText;
+		m_ammoText = nullptr;
+	}
+
+	delete m_timerText;
+	m_timerText = nullptr;
+
+	delete m_statText;
+	m_statText = nullptr;
+
+	delete m_playAgainBtn;
+	m_playAgainBtn = nullptr;
+
+	delete m_quitGameBtn;
+	m_quitGameBtn = nullptr;
 
 	BulletPawn::unloadAssets();
 	EnemyPawn::unloadAssets();

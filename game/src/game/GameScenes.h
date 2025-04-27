@@ -8,6 +8,7 @@
 #include "engine/Scene.h"
 #include "game/GamePawns.h"
 #include "game/Map.h"
+#include "game/GameUI.h"
 
 class GameScene : public Scene {
 public:
@@ -25,6 +26,8 @@ private:
 	std::uniform_real_distribution<float> m_packsDistX;
 	std::uniform_real_distribution<float> m_packsDistY;
 
+	sf::Clock m_gameClock;
+
 	sf::View m_camera;
 	PlayerPawn* m_player;
 	Map* m_map;
@@ -40,6 +43,22 @@ private:
 
 	bool m_isPaused;
 	bool m_isGameOver;
+
+	//UI
+	UIImage* m_health;
+	UIText* m_healthText;
+
+	UIImage* m_ammo;
+	UIText* m_ammoText;
+
+	UIText* m_timerText;
+
+	UIText* m_pausedText;
+
+	////game end
+	UIText* m_statText;
+	Button<void(*)()>* m_playAgainBtn;
+	Button<void(*)()>* m_quitGameBtn;
 };
 
 #endif // !GAME_SCENES

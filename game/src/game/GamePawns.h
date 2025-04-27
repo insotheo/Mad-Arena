@@ -90,6 +90,8 @@ public:
 	inline bool isAlive() const { return m_health > 0; }
 	inline void kick(float damage) { m_health -= damage; }
 	inline float getHealth() const { return m_health; }
+	inline int getAmmo() const { return m_ammo; }
+	inline int getAmmoPacks() const { return m_ammoPacks; }
 
 	inline void reloadAmmo() {
 		if (m_ammoPacks > 0) {
