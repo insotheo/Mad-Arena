@@ -37,6 +37,9 @@ private:
 	std::vector<sf::Vector2f> m_spawnersPoints; //array: 8 points
 
 	float m_packSpawnerTimer = 0.f;
+
+	bool m_isPaused;
+	bool m_isGameOver;
 };
 
 #endif // !GAME_SCENES

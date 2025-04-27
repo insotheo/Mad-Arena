@@ -98,6 +98,9 @@ public:
 		}
 	}
 	inline void addAmmoPack() { m_ammoPacks += 1; }
+
+	inline void addKill() { m_killCounter += 1; }
+	inline int getKills() const { return m_killCounter; }
 private:
 	sf::Vector2f m_pos;
 	sf::Vector2f m_vel = { 0.f, 0.f };
@@ -118,6 +121,7 @@ private:
 	//stats
 
 	float m_health = CONFIG_PLAYER_INITIAL_HEALTH;
+	unsigned int m_killCounter = 0;
 };
 
 class EnemyPawn : public Pawn {

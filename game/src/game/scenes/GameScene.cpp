@@ -3,6 +3,8 @@
 #include <iostream>
 
 void GameScene::begin() {
+	m_isPaused = false;
+	m_isGameOver = false;
 	std::random_device rd;
 	m_randEng = std::mt19937(rd());
 	m_dist = std::uniform_int_distribution<int>(0, 7);
@@ -27,6 +29,14 @@ void GameScene::begin() {
 
 void GameScene::tick(WND wnd, float dt)
 {
+	if (m_isPaused) {
+		return;
+	}
+
+	if (m_isGameOver) {
+		return;
+	}
+
 	m_player->tick(wnd, *this, dt);
 	m_camera.setCenter(m_player->getPos());
 
@@ -70,6 +80,7 @@ void GameScene::tick(WND wnd, float dt)
 		enemy->ai_tick(wnd, *m_player, dt);
 
 		if (!enemy->isAlive()) {
+			m_player->addKill();
 			delete enemy;
 			it = m_enemies.erase(it);
 		}
@@ -131,12 +142,17 @@ void GameScene::tick(WND wnd, float dt)
 			}
 		}
 	}
+
+	if (m_player->getHealth() <= 0) {
+		m_isGameOver = true;
+		m_isPaused = false;
+	}
 }
 
 void GameScene::draw(WND wnd)
 {
 	wnd.setView(m_camera);
-	if (m_player->getHealth() <= 0) {
+	if (m_isGameOver) {
 		wnd.clear(sf::Color::Black);
 		m_player->draw(wnd, *this);
 		return;
@@ -146,23 +162,25 @@ void GameScene::draw(WND wnd)
 
 	m_map->_draw(wnd, viewRect);
 
-	m_player->draw(wnd, *this);
+	if (!m_isPaused) {
+		m_player->draw(wnd, *this);
 
-	for (auto& enemy : m_enemies) {
-		if (viewRect.findIntersection({ enemy->getPos() - (enemy->getRect().size / 2.f), enemy->getRect().size * 2.f })) {
-			enemy->draw(wnd, *this);
+		for (auto& enemy : m_enemies) {
+			if (viewRect.findIntersection({ enemy->getPos() - (enemy->getRect().size / 2.f), enemy->getRect().size * 2.f })) {
+				enemy->draw(wnd, *this);
+			}
 		}
-	}
 
-	for (auto& bullet : m_bullets) {
-		if (viewRect.contains(bullet->getRectangle().position)) {
-			bullet->draw(wnd, *this);
+		for (auto& bullet : m_bullets) {
+			if (viewRect.contains(bullet->getRectangle().position)) {
+				bullet->draw(wnd, *this);
+			}
 		}
-	}
 
-	for (auto& pack : m_ammoPacks) {
-		if (viewRect.contains(pack->getRect().position)) {
-			pack->draw(wnd, *this);
+		for (auto& pack : m_ammoPacks) {
+			if (viewRect.contains(pack->getRect().position)) {
+				pack->draw(wnd, *this);
+			}
 		}
 	}
 }
@@ -208,5 +226,12 @@ void GameScene::event(WND wnd, const EVENT e)
 		if (releasedKey->code == sf::Keyboard::Key::R) {
 			m_player->reloadAmmo();
 		}
+		else if (releasedKey->code == sf::Keyboard::Key::Escape && !m_isGameOver) {
+			m_isPaused = !m_isPaused;
+		}
+	}
+
+	if (e->is<sf::Event::FocusLost>() && !m_isGameOver) {
+		m_isPaused = true;
 	}
 }

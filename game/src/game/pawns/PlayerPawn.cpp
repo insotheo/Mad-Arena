@@ -15,6 +15,7 @@ void PlayerPawn::begin() {
 
 void PlayerPawn::tick(WND wnd, SCENE_REF scene, float dt)
 {
+	m_sprite.setTexture(s_default);
 	//movement
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) m_vel.y -= CONFIG_PLAYER_MOVEMENT_SPEED;
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) m_vel.y += CONFIG_PLAYER_MOVEMENT_SPEED;
@@ -38,6 +39,7 @@ void PlayerPawn::tick(WND wnd, SCENE_REF scene, float dt)
 	}
 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && m_canShoot && m_ammo > 0) {
+		m_sprite.setTexture(s_anim);
 		sf::Vector2f dir(dx, dy);
 
 		BulletPawn* bullet = new BulletPawn(m_pos + sf::Vector2f{1.5f * m_sprite.getLocalBounds().size.x * dir.x, 1.5f * m_sprite.getLocalBounds().size.y * dir.y},
@@ -73,7 +75,7 @@ void PlayerPawn::loadAssets()
 {
 	if (!s_assetsLoaded) {
 		if (!s_default.loadFromFile("./assets/player/sprite.png")) { return; }
-		if (!s_anim.loadFromFile("./assets/player/animation.png")) { return; }
+		if (!s_anim.loadFromFile("./assets/player/shooting.png")) { return; }
 
 		s_assetsLoaded = true;
 	}
