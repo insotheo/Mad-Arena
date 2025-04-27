@@ -23,7 +23,7 @@ void GameScene::begin() {
 	m_ammoText = new UIText("120/3", 18, { 65, 105 }, sf::Color::White);
 	m_ammo = new UIImage("./assets/ui/bullet.png", sf::FloatRect({ 0, -15 }, { 3.5f, 4.5f }), *m_ammoText, { 25, 90 });
 
-	m_pausedText = new UIText("GAME IS PAUSED...\nPress [esc] to play...", 28, { 300, 60 }, sf::Color::White, sf::Color::Black, 2);
+	m_pausedText = new UIText("GAME IS PAUSED...\nPress [esc] to play...", 28, { 400, 60 }, sf::Color::White, sf::Color::Black, 2);
 
 	m_statText = new UIText("", 24, {500, 100}, sf::Color::White);
 	m_playAgainBtn = new Button<void(*)()>(playAgainBtnClick, sf::FloatRect({200, 200}, {150, 35}), "PLAY AGAIN", sf::Color::White, sf::Color::Red, sf::Color::Black);
